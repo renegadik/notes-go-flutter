@@ -16,13 +16,6 @@ type Note struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	UserID     uint
-	IsPinned   bool   `gorm:"default:false"`
-	IsArchived bool   `gorm:"default:false"`
-	Tags       []Tag  `gorm:"many2many:note_tags;"`              // связь с таблицей Tags
-	Color      string `gorm:"type:varchar(7);default:'#FFFFFF'"` // hex код
-}
-
-type Tag struct {
-	ID   uint   `gorm:"primaryKey"`
-	Name string `gorm:"unique;not null"` // название тега, уникальное
+	IsPinned   bool `gorm:"default:false"`
+	IsArchived bool `gorm:"default:false"`
 }

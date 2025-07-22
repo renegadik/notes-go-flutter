@@ -96,3 +96,96 @@ func (h *Handler) LoginUser(c *gin.Context) {
 
 	c.JSON(200, gin.H{"status": "success", "message": "login success", "id_user": dbUser.ID, "username": dbUser.Username, "token": token})
 }
+
+func (h *Handler) CreateNote(c *gin.Context) {
+	var input struct {
+		UserID uint   `json:"id_user" binding:"required"`
+		Title  string `json:"title" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	note := model.Note{
+		Title:      input.Title,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+		UserID:     input.UserID,
+		IsPinned:   false,
+		IsArchived: false,
+	}
+
+	if err := db.DB.Create(&note).Error; err != nil {
+		c.JSON(500, gin.H{"status": "error", "message": "failed create note"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success", "message": "note create success", "id_note": note.ID})
+}
+
+func (h *Handler) GetUserNotes(c *gin.Context) {
+	var input struct {
+		UserID uint `json:"id_user" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	var notes []model.Note
+	if err := db.DB.Where("user_id = ?", input.UserID).Find(&notes).Error; err != nil {
+		c.JSON(500, gin.H{"status": "error", "message": "failed to fetch notes"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success", "notes": notes})
+}
+
+func (h *Handler) GetNoteById(c *gin.Context) {
+	var input struct {
+		ID uint `json:"id_note" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	var note model.Note
+	if err := db.DB.First(&note, input.ID).Error; err != nil {
+		c.JSON(404, gin.H{"status": "error", "message": "note not found"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success", "note": note})
+}
+
+func (h *Handler) UpdateNote(c *gin.Context) {
+	var input struct {
+		ID      uint   `json:"id_note" binding:"required"`
+		Content string `json:"content"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	var note model.Note
+	if err := db.DB.First(&note, input.ID).Error; err != nil {
+		c.JSON(404, gin.H{"status": "error", "message": "note not found"})
+		return
+	}
+
+	note.Content = input.Content
+	note.UpdatedAt = time.Now()
+	if err := db.DB.Save(&note).Error; err != nil {
+		c.JSON(500, gin.H{"status": "error", "message": "failed to update note"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success", "id_note": note.ID})
+}

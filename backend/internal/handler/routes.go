@@ -15,6 +15,9 @@ func InitRoutes(r *gin.Engine, jwtSecret string) {
 	api := r.Group("/api")
 	api.Use(auth.AuthMiddleware(jwtSecret))
 	{
-		api.POST("/test", h.Test)
+		api.POST("/createNote", h.CreateNote)
+		api.POST("/getAllUserNotes", h.GetUserNotes)
+		api.POST("/getNoteById", h.GetNoteById)
+		api.POST("/updateNote", h.UpdateNote)
 	}
 }

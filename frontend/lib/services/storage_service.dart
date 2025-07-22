@@ -30,6 +30,11 @@ class StorageService {
     return await _storage.read(key: 'user_id');
   }
 
+  Future<int?> getUserIdInt() async {
+    final idStr = await _storage.read(key: 'user_id');
+    return idStr != null ? int.tryParse(idStr) : null;
+  }
+
   Future<String?> getUserLogin() async {
     return await _storage.read(key: 'user_login');
   }
