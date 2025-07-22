@@ -67,10 +67,39 @@ class _NoteScreenState extends State<NoteScreen> with WidgetsBindingObserver {
         leading: BackButton(
           onPressed: () async {
             await _saveNote();
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
           },
         ),
         title: Text(_noteTitle ?? 'Note'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            tooltip: 'Delete',
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Delete note?'),
+                  content: const Text('Delete note?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                await ApiService().deleteNote(widget.noteId);
+                Navigator.of(context).pop(true);
+              }
+            },
+          ),
+        ],
       ),
       body: !_isLoaded
           ? const Center(child: CircularProgressIndicator())

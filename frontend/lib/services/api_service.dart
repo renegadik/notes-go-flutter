@@ -142,4 +142,20 @@ class ApiService {
 
     return response.statusCode == 200;
   }
+
+  Future<bool> deleteNote(int noteId) async {
+    final token = await StorageService().getToken(); 
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/deleteNote'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'id_note': noteId,
+      }),
+    );
+
+    return response.statusCode == 200;
+  }
 }

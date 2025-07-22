@@ -19,5 +19,6 @@ func InitRoutes(r *gin.Engine, jwtSecret string) {
 		api.POST("/getAllUserNotes", h.GetUserNotes)
 		api.POST("/getNoteById", h.GetNoteById)
 		api.POST("/updateNote", h.UpdateNote)
+		api.POST("/deleteNote", h.DeleteNote)
 	}
 }

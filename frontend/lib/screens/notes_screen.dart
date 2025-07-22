@@ -4,9 +4,14 @@ import '../services/api_service.dart';
 import 'login_screen.dart';
 import 'note_screen.dart';
 
-class NotesScreen extends StatelessWidget {
+class NotesScreen extends StatefulWidget {
   const NotesScreen({super.key});
 
+  @override
+  State<NotesScreen> createState() => _NotesScreenState();
+}
+
+class _NotesScreenState extends State<NotesScreen> {
   Future<void> _logout(BuildContext context) async {
     await StorageService().deleteAllData();
     Navigator.of(context).pushAndRemoveUntil(
@@ -46,12 +51,13 @@ class NotesScreen extends StatelessWidget {
       final noteId = note != null ? note[0]['id_note'] : null;
 
       if (noteId != null) {
-        Navigator.push(
+        final res = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => NoteScreen(noteId: noteId),
           ),
         );
+        if (res == true) setState(() {});
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error creating note')),
@@ -60,7 +66,7 @@ class NotesScreen extends StatelessWidget {
     }
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -85,7 +91,7 @@ class NotesScreen extends StatelessWidget {
                     itemBuilder: (context) => [
                       PopupMenuItem(
                         child: Text(
-                          'Выход',
+                          'Logout',
                           style: const TextStyle(color: Colors.red),
                         ),
                         onTap: () => _logout(context),
@@ -106,25 +112,26 @@ class NotesScreen extends StatelessWidget {
           }
           final notes = (snapshot.data?['notes']) ?? [];
           if (notes.isEmpty) {
-            return const Center(child: Text('Нет заметок'));
+            return const Center(child: Text('Empty notes'));
           }
           return ListView.builder(
             itemCount: notes.length,
             itemBuilder: (context, index) {
               final note = notes[index];
-              final title = note['Title'] ?? 'Без названия';
+              final title = note['Title'] ?? 'No name';
               final updatedAt = note['UpdatedAt'] ?? '';
               final noteId = note['ID'];
               return ListTile(
                 title: Text(title),
-                subtitle: Text('Обновлено: $updatedAt'),
-                onTap: () {
-                  Navigator.push(
+                subtitle: Text('Updated: $updatedAt'),
+                onTap: () async {
+                  final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => NoteScreen(noteId: noteId),
                     ),
                   );
+                  if (result == true) setState(() {});
                 },
               );
             },
@@ -134,7 +141,7 @@ class NotesScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateNoteDialog(context),
         child: const Icon(Icons.add),
-        tooltip: 'Создать заметку',
+        tooltip: 'Create note',
       ),
     );
   }

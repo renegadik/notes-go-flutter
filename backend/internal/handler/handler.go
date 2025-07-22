@@ -189,3 +189,21 @@ func (h *Handler) UpdateNote(c *gin.Context) {
 
 	c.JSON(200, gin.H{"status": "success", "id_note": note.ID})
 }
+
+func (h *Handler) DeleteNote(c *gin.Context) {
+	var input struct {
+		ID uint `json:"id_note" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	if err := db.DB.Delete(&model.Note{}, input.ID).Error; err != nil {
+		c.JSON(500, gin.H{"status": "error", "message": "failed to delete note"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success", "message": "note deleted"})
+}
