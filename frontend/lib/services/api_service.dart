@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const baseUrl = 'http://10.0.2.2:8080'; // адрес твоего бэкенда
+  static const baseUrl = 'http://10.0.2.2:8080'; 
 
-  Future<String?> login(String username, String password) async {
+  Future<List<dynamic>?> login(String username, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/login'),
       headers: {'Content-Type': 'application/json'},
@@ -13,7 +13,11 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return data['token']; // возвращаем JWT
+      if (data is List) {
+        return data; 
+      } else {
+        return [data]; 
+      }
     } else {
       return null;
     }

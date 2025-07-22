@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
@@ -22,10 +24,17 @@ class _LoginScreenState extends State<LoginScreen> {
     final username = _usernameController.text;
     final password = _passwordController.text;
 
-    final token = await _apiService.login(username, password);
+    final request = await _apiService.login(username, password);
 
-    if (token != null) {
+    final token = request != null ? request[0]['token'] : null;
+    final userId = request != null ? request[0]['id_user'] : null;
+    final userLogin = request != null ? request[0]['username'] : null;
+
+    debugPrint(jsonEncode(request));
+
+    if (token != null && userId != null && userLogin != null) {
       await _storageService.saveToken(token);
+      await _storageService.saveUserData(id: userId.toString(), login: userLogin);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => NotesScreen()),

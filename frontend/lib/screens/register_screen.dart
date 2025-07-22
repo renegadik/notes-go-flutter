@@ -24,26 +24,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final password = _passwordController.text;
     final passwordConfirm = _passwordConfirmController.text;
 
-    if (password != passwordConfirm) {
-      setState(() {
-        _error = "Passwords do not match";
-        _success = null;
-      });
-      return;
-    }
-
     final request = await _apiService.register(username, password, passwordConfirm);
-
-    debugPrint(jsonEncode(request));
 
     if (request != null && request[0]['status'] == 'success') {
       setState(() {
         _error = null;
-        _success = "success.";
+        _success = "Successfully registered! You can login";
       });
     } else {
       setState(() {
-        _error = request != null ? request[0]['message'] : "registration failed";
+        _error = request != null ? request[0]['message'] : "Registration failed";
         _success = null;
       });
     }

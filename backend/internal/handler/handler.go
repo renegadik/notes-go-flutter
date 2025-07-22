@@ -94,5 +94,5 @@ func (h *Handler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"status": "success", "message": "login success", "token": token})
+	c.JSON(200, gin.H{"status": "success", "message": "login success", "id_user": dbUser.ID, "username": dbUser.Username, "token": token})
 }
