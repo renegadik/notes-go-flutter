@@ -117,7 +117,7 @@ class _NotesScreenState extends State<NotesScreen> {
           if (notes.isEmpty) {
             return const Center(child: Text('Empty notes'));
           }
-          
+
           return ListView.builder(
             itemCount: notes.length,
             itemBuilder: (context, index) {
@@ -127,7 +127,7 @@ class _NotesScreenState extends State<NotesScreen> {
               final noteId = note['ID'];
               return ListTile(
                 title: Text(title),
-                subtitle: Text('Last update: ${formatDate(updatedAt)}'),
+                subtitle: Text('Last update ${dateBefore(updatedAt)}'),
                 onTap: () async {
                   final result = await Navigator.push(
                     context,
