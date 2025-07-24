@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../functions.dart';
 
 class NoteScreen extends StatefulWidget {
   final int noteId;
@@ -122,7 +123,7 @@ class _NoteScreenState extends State<NoteScreen> with WidgetsBindingObserver {
                   Align(
                     alignment: Alignment.center,
                     child: Text(
-                      'Last update: ${_formatDate(_updatedAt)}',
+                      'Last update: ${formatDate(_updatedAt)}',
                       style: const TextStyle(color: Colors.grey, fontSize: 13),
                     ),
                   ),
@@ -130,12 +131,5 @@ class _NoteScreenState extends State<NoteScreen> with WidgetsBindingObserver {
               ),
             ),
     );
-  }
-
-  String _formatDate(String? dateStr) {
-    if (dateStr == null) return '';
-    final date = DateTime.tryParse(dateStr);
-    if (date == null) return dateStr;
-    return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 }

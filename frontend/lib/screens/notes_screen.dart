@@ -3,6 +3,7 @@ import '../services/storage_service.dart';
 import '../services/api_service.dart';
 import 'login_screen.dart';
 import 'note_screen.dart';
+import '../functions.dart';
 
 class NotesScreen extends StatefulWidget {
   const NotesScreen({super.key});
@@ -45,10 +46,11 @@ class _NotesScreenState extends State<NotesScreen> {
         ],
       ),
     );
-
+    
     if (result != null && result.trim().isNotEmpty) {
       final note = await ApiService().createNote(result.trim());
       final noteId = note != null ? note[0]['id_note'] : null;
+      final message = note != null ? note[0]['message'] : 'Error creating note';
 
       if (noteId != null) {
         final res = await Navigator.push(
@@ -60,7 +62,7 @@ class _NotesScreenState extends State<NotesScreen> {
         if (res == true) setState(() {});
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error creating note')),
+          SnackBar(content: Text(message)),
         );
       }
     }
@@ -111,9 +113,11 @@ class _NotesScreenState extends State<NotesScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           final notes = (snapshot.data?['notes']) ?? [];
+
           if (notes.isEmpty) {
             return const Center(child: Text('Empty notes'));
           }
+          
           return ListView.builder(
             itemCount: notes.length,
             itemBuilder: (context, index) {
@@ -123,7 +127,7 @@ class _NotesScreenState extends State<NotesScreen> {
               final noteId = note['ID'];
               return ListTile(
                 title: Text(title),
-                subtitle: Text('Updated: $updatedAt'),
+                subtitle: Text('Last update: ${formatDate(updatedAt)}'),
                 onTap: () async {
                   final result = await Navigator.push(
                     context,
@@ -131,7 +135,9 @@ class _NotesScreenState extends State<NotesScreen> {
                       builder: (_) => NoteScreen(noteId: noteId),
                     ),
                   );
-                  if (result == true) setState(() {});
+                  if (result == true) {
+                    setState(() {});
+                  }
                 },
               );
             },
@@ -140,8 +146,8 @@ class _NotesScreenState extends State<NotesScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateNoteDialog(context),
-        child: const Icon(Icons.add),
         tooltip: 'Create note',
+        child: const Icon(Icons.add),
       ),
     );
   }

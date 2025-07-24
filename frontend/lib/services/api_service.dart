@@ -12,16 +12,12 @@ class ApiService {
       body: jsonEncode({'username': username, 'password': password}),
     );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data is List) {
-        return data; 
-      } else {
-        return [data]; 
-      }
-    } else {
-      return null;
+    if (response.statusCode != 200 && response.statusCode != 400) {
+			return null;
     }
+
+    final data = jsonDecode(response.body);
+    return data is List ? data : [data];
   }
 
   Future<List<dynamic>?> register(String username, String password, String passwordConfirm) async {
@@ -36,23 +32,19 @@ class ApiService {
       }),
     );
 
-    if (response.statusCode == 200 || response.statusCode == 400) {
-      final data = jsonDecode(response.body);
-      if (data is List) {
-        return data; 
-      } else {
-        return [data]; 
-      }
-    } else {
-      return null;
+    if (response.statusCode != 200 && response.statusCode != 400) {
+			return null;
     }
+		
+    final data = jsonDecode(response.body);
+    return data is List ? data : [data];
   }
 
   Future<List<dynamic>?> createNote(String title) async {
     final token = await StorageService().getToken();
     final idUser = await StorageService().getUserIdInt();
     final response = await http.post(
-      Uri.parse('$baseUrl/api/createNote'),
+    Uri.parse('$baseUrl/api/createNote'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -63,16 +55,12 @@ class ApiService {
       }),
     );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data is List) {
-        return data; 
-      } else {
-        return [data]; 
-      }
-    } else {
-      return null;
+    if (response.statusCode != 200 && response.statusCode != 400) {
+			return null;
     }
+
+    final data = jsonDecode(response.body);
+		return data is List ? data : [data];
   }
 
   Future<Map<String, dynamic>?> getUserNotes() async {
@@ -80,7 +68,7 @@ class ApiService {
     final idUser = await StorageService().getUserIdInt();
 
     final response = await http.post(
-      Uri.parse('$baseUrl/api/getAllUserNotes'),
+    Uri.parse('$baseUrl/api/getAllUserNotes'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -90,21 +78,18 @@ class ApiService {
       }),
     );
 
-    if (response.statusCode == 200 || response.statusCode == 400) {
-      final data = jsonDecode(response.body);
-      if (data is Map<String, dynamic>) {
-        return data;
-      }
-      return null;
-    } else {
-      return null;
+		if (response.statusCode != 200 && response.statusCode != 400) {
+			return null;
     }
+
+    final data = jsonDecode(response.body);
+	  return data is Map<String, dynamic> ? data : null;
   }
 
   Future<Map<String, dynamic>?>? getNoteById(int noteID) async {
     final token = await StorageService().getToken();
     final response = await http.post(
-      Uri.parse('$baseUrl/api/getNoteById'),
+    Uri.parse('$baseUrl/api/getNoteById'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -114,22 +99,19 @@ class ApiService {
         }),
       );
 
-    if (response.statusCode == 200 || response.statusCode == 400) {
-      final data = jsonDecode(response.body);
-      if (data is Map<String, dynamic>) {
-        return data;
-      }
-      return null;
-      } else {
-        return null;
+		if (response.statusCode != 200 && response.statusCode != 400) {
+			return null;
     }
+		
+		final data = jsonDecode(response.body);
+		return data is Map<String, dynamic> ? data : null;
   }
 
   Future<bool> updateNote(int noteId, String text) async {
     final token = await StorageService().getToken();
 
     final response = await http.post(
-      Uri.parse('$baseUrl/api/updateNote'),
+    Uri.parse('$baseUrl/api/updateNote'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -146,7 +128,7 @@ class ApiService {
   Future<bool> deleteNote(int noteId) async {
     final token = await StorageService().getToken(); 
     final response = await http.post(
-      Uri.parse('$baseUrl/api/deleteNote'),
+    Uri.parse('$baseUrl/api/deleteNote'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
