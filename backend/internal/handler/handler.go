@@ -207,3 +207,145 @@ func (h *Handler) DeleteNote(c *gin.Context) {
 
 	c.JSON(200, gin.H{"status": "success", "message": "note deleted"})
 }
+
+func (h *Handler) DeleteManyNotes(c *gin.Context) { // TODO
+	var input struct {
+		IDs []uint `json:"ids" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	if len(input.IDs) == 0 {
+		c.JSON(400, gin.H{"status": "error", "message": "no IDs provided"})
+		return
+	}
+
+	if err := db.DB.Where("id IN ?", input.IDs).Delete(&model.Note{}).Error; err != nil {
+		c.JSON(500, gin.H{"status": "error", "message": "failed to delete notes"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success", "message": "notes deleted"})
+}
+
+func (h *Handler) PinNote(c *gin.Context) { // TODO
+	var input struct {
+		ID uint `json:"id_note" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	var note model.Note
+	if err := db.DB.First(&note, input.ID).Error; err != nil {
+		c.JSON(404, gin.H{"status": "error", "message": "note not found"})
+		return
+	}
+
+	note.IsPinned = !note.IsPinned
+	if err := db.DB.Save(&note).Error; err != nil {
+		c.JSON(500, gin.H{"status": "error", "message": "failed to update note"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success", "id_note": note.ID, "is_pinned": note.IsPinned})
+}
+
+func (h *Handler) UnpinNote(c *gin.Context) { // TODO
+	var input struct {
+		ID uint `json:"id_note" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	var note model.Note
+	if err := db.DB.First(&note, input.ID).Error; err != nil {
+		c.JSON(404, gin.H{"status": "error", "message": "note not found"})
+		return
+	}
+
+	note.IsPinned = false
+	if err := db.DB.Save(&note).Error; err != nil {
+		c.JSON(500, gin.H{"status": "error", "message": "failed to update note"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success", "id_note": note.ID, "is_pinned": note.IsPinned})
+}
+
+func (h *Handler) ArchiveNote(c *gin.Context) { // TODO
+	var input struct {
+		ID uint `json:"id_note" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	var note model.Note
+	if err := db.DB.First(&note, input.ID).Error; err != nil {
+		c.JSON(404, gin.H{"status": "error", "message": "note not found"})
+		return
+	}
+
+	note.IsArchived = !note.IsArchived
+	if err := db.DB.Save(&note).Error; err != nil {
+		c.JSON(500, gin.H{"status": "error", "message": "failed to update note"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success", "id_note": note.ID, "is_archived": note.IsArchived})
+}
+
+func (h *Handler) UnarchiveNote(c *gin.Context) { // TODO
+	var input struct {
+		ID uint `json:"id_note" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	var note model.Note
+	if err := db.DB.First(&note, input.ID).Error; err != nil {
+		c.JSON(404, gin.H{"status": "error", "message": "note not found"})
+		return
+	}
+
+	note.IsArchived = false
+	if err := db.DB.Save(&note).Error; err != nil {
+		c.JSON(500, gin.H{"status": "error", "message": "failed to update note"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success", "id_note": note.ID, "is_archived": note.IsArchived})
+}
+
+func (h *Handler) GetArchivedNotes(c *gin.Context) { // TODO
+	var input struct {
+		UserID uint `json:"id_user" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	var notes []model.Note
+	if err := db.DB.Where("user_id = ? AND is_archived = ?", input.UserID, true).Find(&notes).Error; err != nil {
+		c.JSON(500, gin.H{"status": "error", "message": "failed to fetch archived notes"})
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success", "notes": notes})
+}
